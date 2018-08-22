@@ -1,0 +1,2 @@
+# Scoary (Brynildsrud et al. 2016)
+scoary -g roary_outputs/B_cereus_de_novo_assembly/gene_presence_absence.csv -t ad-hoc/scoary_B_cereus_de_novo_assembly/traits.csv -o ad-hoc/scoary_B_cereus_de_novo_assembly
