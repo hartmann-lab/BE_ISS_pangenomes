@@ -1,0 +1,24 @@
+INFO [2018-08-22 08:57:40] [[1]]
+INFO [2018-08-22 08:57:40] list(rownames(fxn_df_bin_bac), rownames(fxn_df_bin_staph))
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $category.names
+INFO [2018-08-22 08:57:40] c("B. cereus", "S. aureus")
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $filename
+INFO [2018-08-22 08:57:40] [1] "pangenomes_ad-hoc/R_files/taxon_overlaps/fxn_overlap_all.png"
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $fill
+INFO [2018-08-22 08:57:40] c("blue", "red")
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $cex
+INFO [2018-08-22 08:57:40] [1] 4
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $scaled
+INFO [2018-08-22 08:57:40] [1] 0
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $cat.cex
+INFO [2018-08-22 08:57:40] [1] 0
+INFO [2018-08-22 08:57:40] 
+INFO [2018-08-22 08:57:40] $cat.pos
+INFO [2018-08-22 08:57:40] [1] 0
+INFO [2018-08-22 08:57:40] 

@@ -1,0 +1,36 @@
+06/12/2018 01:52:09 PM    ==== Scoary started ====
+06/12/2018 01:52:09 PM    Command: /Users/ryanblaustein/anaconda3/bin/scoary -g gene_presence_absence.csv -t ad-hoc/scoary/traits.csv -o ad-hoc/scoary
+06/12/2018 01:52:09 PM    Reading gene presence absence file
+06/12/2018 01:52:09 PM    Creating Hamming distance matrix based on gene presence/absence
+06/12/2018 01:52:09 PM    Building UPGMA tree from distance matrix
+06/12/2018 01:52:09 PM    Reading traits file
+06/12/2018 01:52:09 PM    Finished loading files into memory.
+
+
+06/12/2018 01:52:09 PM    ==== Performing statistics ====
+06/12/2018 01:52:09 PM    -- Filtration options --
+06/12/2018 01:52:09 PM    Individual (Naive):    0.05
+06/12/2018 01:52:09 PM    Collapse genes:    False
+
+
+06/12/2018 01:52:09 PM    Tallying genes and performing statistical analyses
+06/12/2018 01:52:09 PM    Gene-wise counting and Fisher's exact tests for trait: ISS
+06/12/2018 01:52:09 PM    Adding p-values adjusted for testing multiple hypotheses
+06/12/2018 01:52:09 PM    Gene-wise counting and Fisher's exact tests for trait: Human
+06/12/2018 01:52:10 PM    Adding p-values adjusted for testing multiple hypotheses
+06/12/2018 01:52:10 PM    Gene-wise counting and Fisher's exact tests for trait: Soil
+06/12/2018 01:52:11 PM    Adding p-values adjusted for testing multiple hypotheses
+06/12/2018 01:52:11 PM    Storing results: ISS
+06/12/2018 01:52:11 PM    Calculating max number of contrasting pairs for each nominally significant gene
+06/12/2018 01:52:13 PM    Storing results to file
+06/12/2018 01:52:13 PM    Storing results: Human
+06/12/2018 01:52:13 PM    Calculating max number of contrasting pairs for each nominally significant gene
+06/12/2018 01:52:15 PM    Storing results to file
+06/12/2018 01:52:15 PM    Storing results: Soil
+06/12/2018 01:52:15 PM    Calculating max number of contrasting pairs for each nominally significant gene
+06/12/2018 01:52:15 PM    Storing results to file
+06/12/2018 01:52:15 PM    
+
+06/12/2018 01:52:15 PM    ==== Finished ====
+06/12/2018 01:52:15 PM    Checked a total of 10985 genes for associations to 3 trait(s). Total time used: 6 seconds.
+06/12/2018 01:52:15 PM    No warnings were recorded.
