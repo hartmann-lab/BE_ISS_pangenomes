@@ -4,7 +4,7 @@
 
 # Ryan Blaustein
 # ryan.blaustein@northwestern.edu
-# last edited: 08/22/2018
+# last edited: 12/04/2018
 
 ######################################
 
@@ -15,7 +15,9 @@ library(vegan)
 library(reshape2)
 library(minpack.lm)
 library(ape)
+library(phangorn)
 library(gplots)
+library(heatmap.plus)
 library(VennDiagram)
 
 ### load pangenome matrices from roary output
@@ -400,6 +402,9 @@ names(ord) <- c('pcoa1', 'pcoa2', 'pco3', 'pco4') ## rename coordinates
 ord$Category = bac_meta$Category
 ord$Assembler = bac_meta$Assembler2
 ord$Seq_Tech = bac_meta$Seq_Tech2
+ord$Reference = bac_meta$Reference
+ord$Location = bac_meta$Sample_Site_2
+ord$Culture_Media = bac_meta$Culture_Media 
 
 # Percent explained variation
 eig <- eigenvals(pcoa)
@@ -426,7 +431,7 @@ ggplot(data = ord, aes(x = pcoa1, y = pcoa2, fill = Category)) +
 
 # Strain origin
 beta <- vegdist(t(pangenome_bac), 'jaccard', binary = T)
-adonis(beta ~ Category, data = bac_meta, permutations = 999) 
+adonis(beta ~ Category, data = bac_meta, permutations = 999)
 
 # Assembler
 beta <- vegdist(t(pangenome_bac[,-c(which(is.na(bac_meta$Assembler2) == T))]), 'jaccard', binary = T)
@@ -435,6 +440,18 @@ adonis(beta ~ Assembler2, data = bac_meta, permutations = 999)
 # Sequencing technology
 beta <- vegdist(t(pangenome_bac[,-c(which(is.na(bac_meta$Seq_Tech2) == T))]), 'jaccard', binary = T)
 adonis(beta ~ Seq_Tech2, data = bac_meta, permutations = 999) 
+
+# Reference
+beta <- vegdist(t(pangenome_bac), 'jaccard', binary = T)
+adonis(beta ~ Reference, data = bac_meta, permutations = 999) 
+
+# Location
+beta <- vegdist(t(pangenome_bac[,-c(which(is.na(bac_meta$Sample_Site_2) == T))]), 'jaccard', binary = T)
+adonis(beta ~ Sample_Site_2, data = bac_meta, permutations = 999) 
+
+# Culture Media
+beta <- vegdist(t(pangenome_bac[,-c(which(is.na(bac_meta$Culture_Media) == T))]), 'jaccard', binary = T)
+adonis(beta ~ Culture_Media, data = bac_meta, permutations = 999) 
 
 ### PCoA: ISS samples only ###
 
@@ -475,6 +492,11 @@ ggplot(data = ord, aes(x = pcoa1, y = pcoa2, shape = Site)) +
         legend.position = "bottom",
         legend.background = element_rect(size = 0.5, colour = 1)) +
   guides(shape=guide_legend(nrow = 4, byrow=F))
+
+### PERMANOVA (may need to re-compute distance due to "NA's") ###
+
+# Culture Media
+adonis(beta ~ Culture_Media, data = bac_meta[grep("ISS", bac_meta$Category),], permutations = 999) 
 
 ###
 ### FUNCTIONS ###
@@ -518,6 +540,9 @@ names(ord) <- c('pcoa1', 'pcoa2', 'pco3', 'pco4') ## rename coordinates
 ord$Category = bac_meta$Category
 ord$Assembler = bac_meta$Assembler2
 ord$Seq_Tech = bac_meta$Seq_Tech2
+ord$Reference = bac_meta$Reference
+ord$Location = bac_meta$Sample_Site_2
+ord$Culture_Media = bac_meta$Culture_Media
 
 # Percent explained variation
 eig <- eigenvals(pcoa)
@@ -527,7 +552,7 @@ eig <- eigenvals(pcoa)
 ggplot(data = ord, aes(x = pcoa1, y = pcoa2, fill = Category)) +
   geom_point(alpha = 0.65, 
              shape = 21, 
-             stroke = 0.5, size = 6) +
+             stroke = 0.5, size = 5) +
   theme_bw() +
   xlab('PCo1 (24.0%)') +
   ylab('PCo2 (16.1%)') +
@@ -554,6 +579,17 @@ adonis(beta ~ Assembler2, data = bac_meta, permutations = 999)
 beta <- vegdist(t(fxn_df_bin[,-c(which(is.na(bac_meta$Seq_Tech2) == T))]), 'jaccard', binary = T)
 adonis(beta ~ Seq_Tech2, data = bac_meta, permutations = 999) 
 
+# Reference
+beta <- vegdist(t(fxn_df_bin), 'jaccard', binary = T)
+adonis(beta ~ Reference, data = bac_meta, permutations = 999) 
+
+# Location
+beta <- vegdist(t(fxn_df_bin[,-c(which(is.na(bac_meta$Sample_Site_2) == T))]), 'jaccard', binary = T)
+adonis(beta ~ Sample_Site_2, data = bac_meta, permutations = 999) 
+
+# Culture Media
+beta <- vegdist(t(fxn_df_bin[,-c(which(is.na(bac_meta$Culture_Media) == T))]), 'jaccard', binary = T)
+adonis(beta ~ Culture_Media, data = bac_meta, permutations = 999) 
 
 #########################################
 ### Ordination/Clustering: S. aureus ####
@@ -581,6 +617,9 @@ ord$Category = staph_meta$Category
 ord$MRSA = staph_meta$MRSA
 ord$Assembler = staph_meta$Assembler2
 ord$Seq_Tech = staph_meta$Seq_Tech2
+ord$Reference = staph_meta$Reference
+ord$Location = staph_meta$Sample_Site_2
+ord$Culture_Media = staph_meta$Culture_Media
 
 # Percent explained variation
 eig <- eigenvals(pcoa)
@@ -590,18 +629,20 @@ eig <- eigenvals(pcoa)
 ggplot(data = ord, aes(x = pcoa1, y = pcoa2, fill = Category, shape = Category)) +
   geom_point(alpha = 0.65, 
              #shape = 21,
-             stroke = 0.5, size = 6) +
+             stroke = 0.5, size = 5) +
   theme_bw() +
   xlab('PCo1 (26.4%)') +
   ylab('PCo2 (15.4%)') +
-  theme(axis.text = element_text(size=15, color = "black"),
-        axis.title = element_text(size=16, color = "black"),
+  theme(#axis.text = element_text(size=15, color = "black"),
+        axis.title = element_text(size=17, color = "black"),
         legend.text = element_text(size=15, color = "black"),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
         legend.title = element_blank()) +
   scale_shape_manual(values=c(21,21,21,24,21),
                      guide = "none") +
   scale_fill_manual(values=c("gray", "skyblue", "yellow", "yellow", "brown"),
-                    labels=c("BE-E (n=3)", "BE-SC (n=21)", "Human (n=32)", "H-MRSA (n=47)", "Soil (n=2)")) +
+                    labels=c("BE-E (n=3)", "BE-SC (n=21)", "Human (n=24)", "H-MRSA (n=55)", "Soil (n=2)")) +
   guides(fill = guide_legend(override.aes=list(shape=c(21,21,21,24,21)))) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -629,6 +670,13 @@ adonis(beta ~ Assembler2, data = staph_meta, permutations = 999)
 # Sequencer
 adonis(beta ~ Seq_Tech2, data = staph_meta, permutations = 999) 
 
+# Reference
+adonis(beta ~ Reference, data = staph_meta, permutations = 999) 
+
+# Culture Media
+beta <- vegdist(t(pangenome_staph[,-c(which(is.na(staph_meta$Culture_Media) == T))]), 'jaccard', binary = T)
+adonis(beta ~ Culture_Media, data = staph_meta, permutations = 999) 
+
 # MRSA (Human vs. Human only)
 beta <- vegdist(t(pangenome_staph[,c(grep("Human", staph_meta$Category), 
                                      grep("MRSA", staph_meta$Category))]), 'jaccard', binary = T)
@@ -636,7 +684,7 @@ adonis(beta ~ MRSA, data = staph_meta[c(grep("Human", staph_meta$Category),
                                          grep("MRSA", staph_meta$Category)),], permutations = 999) 
 
 ###
-### ISS ONLY ###
+### ISS ONLY: Genes ###
 ###
 
 # beta-diversity measure
@@ -678,6 +726,32 @@ ggplot(data = ord, aes(x = pcoa1, y = pcoa2, fill = Site, shape = Site)) +
          legend.background = element_rect(size = 0.5, colour = 1),
          legend.position = "bottom") +
   guides(fill=guide_legend(nrow = 6, byrow=F)) 
+
+###
+### Wallace and Voorhies: Dataset Comparisons ###
+###
+
+# assign data
+WV_pan = pangenome_staph[,grep("Wallace and Voorhies", staph_meta$Reference)]
+WV_meta = staph_meta[grep("Wallace and Voorhies", staph_meta$Reference),]
+
+# BE_Earth vs. BE_ISS (R2=0.134, p=0.177)
+beta <- vegdist(t(WV_pan[,grep("BE", WV_meta$Category)]), 
+                'jaccard', binary = T)
+adonis(beta ~ Category, data = WV_meta[grep("BE", WV_meta$Category),], 
+       permutations = 999)
+
+# BE_Earth vs. Human (R2=0.089, p=0.972)
+beta <- vegdist(t(WV_pan[,grep("BE_Earth|Human", WV_meta$Category)]), 
+                'jaccard', binary = T)
+adonis(beta ~ Category, data = WV_meta[grep("BE_Earth|Human", WV_meta$Category),], 
+       permutations = 999)
+
+# BE_ISS vs. Human (R2=0.139, p=0.097)
+beta <- vegdist(t(WV_pan[,grep("BE_ISS|Human", WV_meta$Category)]), 
+                'jaccard', binary = T)
+adonis(beta ~ Category, data = WV_meta[grep("BE_ISS|Human", WV_meta$Category),], 
+       permutations = 999)
 
 ###
 ### FUNCTIONS ###
@@ -722,6 +796,9 @@ ord$Category = staph_meta$Category
 ord$MRSA = staph_meta$MRSA
 ord$Assembler = staph_meta$Assembler2
 ord$Seq_Tech = staph_meta$Seq_Tech2
+ord$Reference = staph_meta$Reference
+ord$Location = staph_meta$Sample_Site_2
+ord$Culture_Media = staph_meta$Culture_Media
 
 # Percent explained variation
 eig <- eigenvals(pcoa)
@@ -730,7 +807,7 @@ eig <- eigenvals(pcoa)
 ### plot PCoA (color by sample category)
 ggplot(data = ord, aes(x = pcoa1, y = pcoa2, fill = Category, shape = Category)) +
   geom_point(alpha = 0.65, 
-             stroke = 0.5, size = 6) +
+             stroke = 0.5, size = 5) +
   theme_bw() +
   xlab('PCo1 (35.3%)') +
   ylab('PCo2 (16.4%)') +
@@ -741,7 +818,7 @@ ggplot(data = ord, aes(x = pcoa1, y = pcoa2, fill = Category, shape = Category))
   scale_shape_manual(values=c(21,21,21,24,21),
                      guide = "none") +
   scale_fill_manual(values=c("gray", "skyblue", "yellow", "yellow", "brown"),
-                    labels=c("BE-E (n=3)", "BE-SC (n=21)", "Human (n=32)", "Hu-MRSA (n=47)", "Soil (n=2)")) +
+                    labels=c("BE-E (n=3)", "BE-SC (n=21)", "Human (n=24)", "H-MRSA (n=55)", "Soil (n=2)")) +
   guides(fill = guide_legend(override.aes=list(shape=c(21,21,21,24,21)))) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
@@ -757,11 +834,38 @@ adonis(beta ~ Assembler2, data = staph_meta, permutations = 999)
 # Sequencer
 adonis(beta ~ Seq_Tech2, data = staph_meta, permutations = 999) 
 
+# Reference
+adonis(beta ~ Reference, data = staph_meta, permutations = 999) 
+
+# Culture Media
+beta <- vegdist(t(fxn_df_bin[,-c(which(is.na(staph_meta$Culture_Media) == T))]), 'jaccard', binary = T)
+adonis(beta ~ Culture_Media, data = staph_meta, permutations = 999) 
+
 # MRSA (Human vs. Human only)
 beta <- vegdist(t(fxn_df_bin[,c(grep("Human", staph_meta$Category),
                                 grep("MRSA", staph_meta$Category))]), 'jaccard', binary = T)
 adonis(beta ~ MRSA, data = staph_meta[c(grep("Human", staph_meta$Category),
                                         grep("MRSA", staph_meta$Category)),], permutations = 999) 
+
+###
+### ISS ONLY: Functions ###
+###
+
+# beta-diversity measure
+beta <- vegdist(t(fxn_df_bin[,grep("ISS", staph_meta$Category)]), 'jaccard', binary = T)
+beta.mat <- as.matrix(beta)
+
+# subset metadata table
+staph_meta_ISS = staph_meta[grep("ISS", staph_meta$Category),]
+
+# Reference
+adonis(beta ~ Reference, data = staph_meta_ISS, permutations = 999) 
+
+# Year
+staph_meta_ISS$Year = substr(staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site, 
+                             start = nchar(as.character(staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site))-4, 
+                             stop = nchar(as.character(staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site))-1)
+adonis(beta ~ Year, data = staph_meta_ISS, permutations = 999) 
 
 
 ####################################
@@ -791,18 +895,40 @@ label.tree = c(1:56)
 for (i in 1:56){
   label.tree[i] = as.character(bac_meta$Sample_Site_2)[grep(core_tree_bac$tip.label[i], rownames(bac_meta))]
 }
-label.tree = paste0("  ", label.tree)
+label.tree = paste0("   ", label.tree)
 core_tree_bac$tip.label = label.tree
 
 ## plot phylogram
-plot(core_tree_bac, 
-     cex = 0.5,
+plot(midpoint(core_tree_bac),
+     cex = 0.9,
      font = 1,
      no.margin = F,
      direction = "downwards",
      edge.width = 1.2)
-tiplabels(bg = col.tree, pch = 21, adj = c(0.501, 0.5), cex = 1.3)
-add.scale.bar(ask = TRUE, cex = 0.7)
+tiplabels(bg = col.tree, pch = 21, adj = c(0.501, 0.496), cex = 1.3)
+add.scale.bar(ask = TRUE, cex = 1.2)
+
+## correlation with accessory gene diversity
+
+# re-load core gene alignment (for matching column/row names)
+core_tree_bac <- read.tree("pangenome_roary_outputs/roary_out_B_cereus/core_gene_aln_tree.newick")
+
+# prep core gene distance matrix
+bac_core_distance <- cophenetic.phylo(midpoint(core_tree_bac))
+bac_core_distance <- bac_core_distance[order(rownames(bac_core_distance)), order(colnames(bac_core_distance))]
+
+# prep accessory gene distance matrix
+bac_accessory_distance <- vegdist(t(pangenome_bac[which(apply(pangenome_bac, 1, sum)<0.95*dim(pangenome_bac)[2]),]), 
+                                  'jaccard', binary = T)
+bac_accessory_distance <- as.matrix(bac_accessory_distance)
+bac_accessory_distance <- bac_accessory_distance[order(rownames(bac_accessory_distance)), order(colnames(bac_accessory_distance))]
+
+# check for same order
+colnames(bac_core_distance) == colnames(bac_accessory_distance)
+rownames(bac_core_distance) == rownames(bac_accessory_distance)
+
+# run mantel test
+mantel(bac_core_distance, bac_accessory_distance)
 
 ### S. aureus ###
 
@@ -831,18 +957,44 @@ label.tree = c(1:105)
 for (i in 1:105){
   label.tree[i] = as.character(staph_meta$Sample_Site_2)[grep(core_tree_staph$tip.label[i], rownames(staph_meta))]
 }
-label.tree = paste0("  ", label.tree)
+label.tree = paste0("    ", label.tree)
 core_tree_staph$tip.label = label.tree
 
+#core_tree_staph$tip.label = paste0("    ",substr(core_tree_staph$tip.label, start = 1, stop = nchar(core_tree_staph$tip.label) - 5))
+
 ## plot phylogram
-plot(core_tree_staph, 
-     cex = 0.4,
+plot(midpoint(core_tree_staph), 
+     #type = "unrooted",
+     cex = 0.6,
      font = 1,
      no.margin = F,
-     direction = "downwards",
+     direction = "downward",
      edge.width = 1.2)
-tiplabels(bg = col.tree, pch = shape.tree, adj = c(0.501, 0.5), cex = 0.9)
-add.scale.bar(ask = TRUE, cex = 0.7)
+tiplabels(bg = col.tree, pch = shape.tree, adj = c(0.501, 0.4995), cex = 0.9)
+add.scale.bar(ask = TRUE, cex = 1.2)
+
+## correlation with accessory gene diversity
+
+# re-load core gene alignment (for matching column/row names)
+core_tree_staph <- read.tree("pangenome_roary_outputs/roary_out_S_aureus/core_gene_aln_tree.newick")
+
+# prep core gene distance matrix
+staph_core_distance <- cophenetic.phylo(midpoint(core_tree_staph))
+staph_core_distance <- staph_core_distance[order(rownames(staph_core_distance)), order(colnames(staph_core_distance))]
+
+# prep accessory gene distance matrix
+staph_accessory_distance <- vegdist(t(pangenome_staph[which(apply(pangenome_staph, 1, sum)<0.95*dim(pangenome_staph)[2]),]), 
+                                    'jaccard', binary = T)
+staph_accessory_distance <- as.matrix(staph_accessory_distance)
+staph_accessory_distance <- staph_accessory_distance[order(rownames(staph_accessory_distance)), order(colnames(staph_accessory_distance))]
+
+# check for same order
+colnames(staph_core_distance) == colnames(staph_accessory_distance)
+rownames(staph_core_distance) == rownames(staph_accessory_distance)
+
+# run mantel test
+mantel(staph_core_distance, staph_accessory_distance)
+
 
 #################################
 ### Function Enrichments: GLM ###
@@ -935,17 +1087,19 @@ fxn_all_staph = fxn_all_staph[order(fxn_all_staph$p.adj.BH),]
 ## write table
 #write.table(fxn_all_staph, 'pangenomes_ad-hoc/R_files/S_aureus/fxns_proportions_glm.txt', sep="\t", col.names=NA, quote = FALSE)
 
+
 ##################################
 ### Function Enrichments: ARGs ###
 ##################################
 
 bac_sig_fxns = fxn_all_bac[which(fxn_all_bac$p.adj.BH < 0.1),c(8,9,10,15)]
-bac_sig_fxns_res = bac_sig_fxns[grep("esistance|lactama|acrolide|transferase|etracyclin", rownames(bac_sig_fxns)),]
+bac_sig_fxns_res = bac_sig_fxns[grep("esistance|lactam|acrolide|transferase|etracyclin", rownames(bac_sig_fxns)),]
 bac_sig_fxns_res # screen functions in Uniprot to confirm whether biological process is "antibiotic resistance"
 
 staph_sig_fxns = fxn_all_staph[which(fxn_all_staph$p.adj.BH < 0.1),c(6,7,9,10,13)]
-staph_sig_fxns_res = staph_sig_fxns[grep("esistance|lactama|acrolide|transferase|etracyclin", rownames(staph_sig_fxns)),]
+staph_sig_fxns_res = staph_sig_fxns[grep("esistance|lactam|acrolide|transferase|etracyclin", rownames(staph_sig_fxns)),]
 staph_sig_fxns_res # screen functions in Uniprot to confirm whether biological process is "antibiotic resistance"
+
 
 ######################################
 ### Function Enrichments: Heatmaps ###
@@ -1026,7 +1180,6 @@ heatmap.2(as.matrix(fxn_all_bac[which(fxn_all_bac$p.adj.BH < 0.001),
 staph_fxn_cat = read.table("pangenomes_ad-hoc/R_files/S_aureus/fxns_biological_process_group.txt", sep="\t",header=T,row.names=1, quote="\"")
 staph_fxn_cat$Gene.Product == rownames(fxn_all_staph[which(fxn_all_staph$p.adj.BH < 0.001),])
 
-
 ## set row side colors by biological process
 tapply(staph_fxn_cat$GO.Bio.2, staph_fxn_cat$GO.Bio.2, length)
 
@@ -1069,6 +1222,97 @@ heatmap.2(as.matrix(fxn_all_staph[which(fxn_all_staph$p.adj.BH < 0.001),
           RowSideColors = as.character(staph_fxn_cat$colors),
           offsetCol = 0,
           margins = c(1, 28))
+
+### S. aureus: Space Only ###
+
+# set matrix
+ISS_staph_heat = fxn_df_bin_staph[which(data.frame(fxn_sample_type_staph,
+                                                   fxn_assoc_staph)$p.adj.BH < 0.001),
+                                  grep("ISS", staph_meta$Category)]
+colnames(ISS_staph_heat) = substr(colnames(ISS_staph_heat), start = 1, stop = 13)
+
+# prerpare metadata layers: study (Sielfaff, Wallace) and year (2002, 2008, 2010, 2011, 2015)
+staph_ISS = cbind(1:21, 1:21)
+
+staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site
+staph_ISS[grep("2002", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site), 1] = 
+  rep("orange",length(grep("2002", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site)))
+staph_ISS[grep("2008", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site), 1] = 
+  rep("green",length(grep("2008", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site)))
+staph_ISS[grep("2010", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site), 1] = 
+  rep("brown",length(grep("2010", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site)))
+staph_ISS[grep("2011", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site), 1] = 
+  rep("purple",length(grep("2011", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site)))
+staph_ISS[grep("2015", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site), 1] = 
+  rep("pink",length(grep("2015", staph_meta[grep("ISS", staph_meta$Category),]$Sample_Site)))
+
+staph_meta[grep("ISS", staph_meta$Category),]$Reference
+staph_ISS[grep("Sielaff", staph_meta[grep("ISS", staph_meta$Category),]$Reference), 2] = 
+  rep("red",length(grep("Sielaff", staph_meta[grep("ISS", staph_meta$Category),]$Reference)))
+staph_ISS[grep("Wallace", staph_meta[grep("ISS", staph_meta$Category),]$Reference), 2] = 
+  rep("blue",length(grep("Wallace", staph_meta[grep("ISS", staph_meta$Category),]$Reference)))
+
+# plot heatmap
+heatmap.plus(as.matrix(ISS_staph_heat),
+          cexCol = 0.8,
+          cexRow = 0.6,
+          scale = "none",
+          col = c("black", "yellow"),
+          ColSideColors = staph_ISS,
+          margins = c(9, 17))
+
+
+##########################################################
+### KEGG pathway correlation with phylogeny: S. aureus ###
+##########################################################
+
+## load data and subset pathways with differential ontology counts
+kegg_s_aureus_subset = read.table("kegg_functions_subset/s_aureus_7branches_clevel.txt",row.names=1, sep="\t",header=T)
+
+## subset pathways with different ontology counts
+kegg_s_aureus_subset_clean = kegg_s_aureus_subset[which(apply(kegg_s_aureus_subset,1,sd) > 0),]
+
+## PCoA
+
+# beta-diversity measure
+beta <- vegdist(t(kegg_s_aureus_subset_clean))
+beta.mat <- as.matrix(beta)
+
+# projection
+pcoa <- cmdscale(beta, k = 4, eig = TRUE)
+
+# cleanup
+ord <- as.data.frame(pcoa$points)
+names(ord) <- c('pco1', 'pco2', 'pco3', 'pco4') ## rename coordinates
+
+# add metadata
+ord$Origin = substr(colnames(kegg_s_aureus_subset_clean), start = 10, stop = nchar(colnames(kegg_s_aureus_subset_clean)))
+ord$Branch = substr(colnames(kegg_s_aureus_subset_clean), start = 1, stop = 8)
+
+# percent explained variation
+eig <- eigenvals(pcoa)
+100*head(eig/sum(eig))
+
+# plot 
+ggplot(data = ord, aes(x = pco1, y = pco2, col = Branch, shape = Origin)) +
+  geom_point(alpha = 0.9, 
+             stroke = 0.5, size = 6.5) +
+  theme_bw() +
+  xlab('PCo1 (24.8%)') +
+  ylab('PCo2 (20.4%)') +
+  scale_color_manual(values = c("blue", "red", "brown", "orange", "purple", "green", "pink")) +
+  theme(axis.text = element_text(size=14, color = "black"),
+        axis.title = element_text(size=15, color = "black"),
+        legend.text = element_text(size=15, color = "black"),
+        legend.title = element_text(size = 16))
+
+##PERMANOVA
+
+# tree branch
+adonis(beta ~ Branch, data = ord, permutations = 999)
+
+# sample origin
+adonis(beta ~ Origin, data = ord, permutations = 999)
 
 
 ######################################
@@ -1137,11 +1381,53 @@ ggplot(lolly_overlap) +
   ylim(-100,100) +
   scale_x_discrete(position = "top") +
   geom_hline(yintercept = c(0)) +
-  theme(axis.title.x = element_text(size=20, color = "black"),
-        axis.text.x = element_text(size=20, color = "black"),
+  theme(#axis.title.x = element_text(size=20, color = "black"),
+        axis.title.x = element_blank(), 
+        #axis.text.x = element_text(size=20, color = "black"),
+        axis.text.x = element_blank(),
         axis.title.y = element_blank(), 
         #axis.text.y = element_text(size=12, color = "black"),
         axis.text.y = element_blank(),
         #axis.ticks.y = element_blank(),
         legend.position = "none",
         panel.border = element_rect(color = "black"))
+
+
+##########################################################################
+### Gene presence/absence distance: original vs. standardized assembly ###
+##########################################################################
+
+## load pan-genome of B. cereus de novo assemblies with spades
+pangenome_bac_spades = read.table("pangenome_roary_outputs/roary_out_B_cereus_de_novo_assembly/gene_presence_absence.Rtab",
+                                  h=T, row.names=1)
+
+## load associated metadata
+bac_meta_spades = read.table("pangenomes_ad-hoc/R_files/B_cereus_de_novo_assembly/Bac_metadata_spades.txt",
+                             sep='\t',h=T,row.names=1,check=F,comment='')
+
+## subset B. cereus pangenome (from all genomes) to appropriate counterparts from de novo assemblies
+pangenome_bac_all_subset <- pangenome_bac[,grep(paste(bac_meta_spades$GCA_Counterpart, collapse = "|"), colnames(pangenome_bac))]
+bac_all_subset_meta <- bac_meta[grep(paste(bac_meta_spades$GCA_Counterpart, collapse = "|"), colnames(pangenome_bac)),]
+
+## subset B. cereus de novo assemblies pangenome to match counterparts from original assemblies
+pangenome_bac_spades_subset <- pangenome_bac_spades[,grep(paste(colnames(pangenome_bac_all_subset), collapse = "|"), bac_meta_spades$GCA_Counterpart)]
+bac_spades_subset_meta <- bac_meta_spades[grep(paste(colnames(pangenome_bac_all_subset), collapse = "|"), bac_meta_spades$GCA_Counterpart),]
+
+## confirm matching sample names across datasets
+bac_spades_subset_meta$GCA_Counterpart[order(bac_spades_subset_meta$GCA_Counterpart)] == 
+  colnames(pangenome_bac_all_subset)[order(colnames(pangenome_bac_all_subset))]
+
+## distance stats on de novo assemblies (mean, se)
+mean(vegdist(t(pangenome_bac_spades_subset), 'jaccard', binary = T)) #avg
+sd(vegdist(t(pangenome_bac_spades_subset), 'jaccard', binary = T))/sqrt(120) #se
+
+## distance stats on original assemblies (mean, se)
+mean(vegdist(t(pangenome_bac_all_subset), 'jaccard', binary = T))
+sd(vegdist(t(pangenome_bac_all_subset), 'jaccard', binary = T))/sqrt(120)
+
+## wilcox test 
+wilcox.test(vegdist(t(pangenome_bac_spades_subset), 'jaccard', binary = T),
+            vegdist(t(pangenome_bac_all_subset), 'jaccard', binary = T))
+
+
+
