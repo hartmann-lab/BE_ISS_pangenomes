@@ -2,9 +2,9 @@
 
 '''
 
-Parses the output file from GhostKoala to retrieve the higher order function (B)
+Parses the output file from GhostKoala to retrieve the higher order function (C)
 and the number of gene products that are associated to the specific function (D). Removes
-duplicate entries present in B 
+duplicate entries present in C
 
 	Input: ghostkoala BRITE output (.kegg) in .txt format
 	Output: list of gene products for each higher-order function (.txt?)
