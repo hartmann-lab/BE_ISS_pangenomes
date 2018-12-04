@@ -1267,7 +1267,7 @@ heatmap.plus(as.matrix(ISS_staph_heat),
 ##########################################################
 
 ## load data and subset pathways with differential ontology counts
-kegg_s_aureus_subset = read.table("kegg_functions_subset/s_aureus_7branches_clevel.txt",row.names=1, sep="\t",header=T)
+kegg_s_aureus_subset = read.table("kegg_functions_subset/parse_output/parse_c_level.txt",row.names=1, sep="\t",header=T)
 
 ## subset pathways with different ontology counts
 kegg_s_aureus_subset_clean = kegg_s_aureus_subset[which(apply(kegg_s_aureus_subset,1,sd) > 0),]
